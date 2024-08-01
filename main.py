@@ -3,9 +3,10 @@ import pandas as pd
 st.header("Luke's Cool New App")
 
 grid = []
-for i in range(0,4):
+dim = 3
+for i in range(0,3):
     row = {}
-    for j in range(0,4):
+    for j in range(0,3):
         row[j] = j
     grid.append(row)
 

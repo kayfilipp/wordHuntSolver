@@ -1,0 +1,18 @@
+1. User Input
+2. Render it
+3. Turn into nodes
+    letter class
+        attributes:
+            1. neighbors
+            2. coordinates
+            3. origin (what letter we reference to get here)
+    search class:
+        current word => list[letters]
+        letters traversed => list[letters]
+    game class:
+        a ton of different searches
+
+4. Recursive Stuff
+    ???
+5. display the result
+6. Reset
