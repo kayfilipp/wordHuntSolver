@@ -11,6 +11,7 @@
         letters traversed => list[letters]
     game class:
         a ton of different searches
+3b. node-ifying the input
 
 4. Recursive Stuff
     ???
