@@ -62,6 +62,38 @@ def render_table(st):
     st.html(html)
 
 
+def render_colored_table(st):
+    grid = st.session_state['grid']
+    dim = st.session_state['grid_dim']
+    longest_word = st.session_state['longest_word']
+    coords = [letter.coordinates for letter in longest_word]
+    html = """
+        <style>
+            table, th, td {
+              border:1px solid black;
+            }
+            td {
+                text-align: center
+            }
+        </style>
+        <table style='width:100%' table-layout:'fixed' border='2'>
+    """
+
+    for i in range(0, dim):
+        td = []
+        for j in range(0, dim):
+            if (j, i) in coords:
+                td.append(f"<td bgcolor='pink' style='color:black'>{grid[i][str(j)]}</td>")
+            else:
+                td.append(f"<td>{grid[i][str(j)]}</td>")
+        td = "".join(td)
+        html += f"<tr>{td}</tr>"
+
+    html += "</table>"
+    st.html(html)
+
+
+
 def transform_grid(st):
     """Transforms grid from a row * column to a column * row struc"""
     grid = st.session_state['grid']

@@ -14,6 +14,7 @@ def reset():
     del st.session_state['grid']
     del st.session_state['results']
     del st.session_state['grid_final']
+    del st.session_state['grid_dim']
 
 
 def init_dim():
@@ -38,25 +39,32 @@ def main():
         print("transforming grid...")
         grid.transform_grid(st)
 
-    grid.render_table(st)
-    st.button("Reset", on_click=reset)
-    st.write("Words:")
+    # if not st.session_state.get('colored_grid', None):
+    #     grid.render_table(st)
+    # else:
+    #     grid.render_colored_table(st)
+
+    # st.button("Reset", on_click=reset)
+    # st.write("Words:")
 
     if not st.session_state.get('results', None):
         game = Nodes.Game()
         game.find_words(st.session_state['grid_final'])
-
         st.session_state['results'] = set([])
+
+        longest_word = []
+
         for results in game.all_search_results:
-            print(results.words_by_character)
+            if len(longest_word) < len(results.longest_word):
+                longest_word = results.longest_word
             st.session_state['results'] = st.session_state['results'] | results.words_by_character
 
+        st.session_state['longest_word'] = longest_word
 
+    grid.render_colored_table(st)
+    st.button("Reset", on_click=reset)
+    st.write("Words:")
     st.text(st.session_state['results'])
-
-
-
-
 
 
 main()
