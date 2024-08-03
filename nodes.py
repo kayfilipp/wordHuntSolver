@@ -20,6 +20,7 @@ class Letter():
         self.neighbors = []
         self.currently_found = False # for recursion - can't make a word using same character twice
 
+
 class SearchResults():
     """
     Holds all relevant data related to a game search
@@ -48,6 +49,7 @@ class SearchResults():
                 self.words_by_coordinates[-1].append(letter.coordinates)
                 new_word.append(letter.character)
             self.words_by_character.add(''.join(new_word))
+
 
 class Game():
     """
@@ -111,6 +113,9 @@ class Game():
 
 
 class Search(Game):
+    """
+    Recursive word search algorithm
+    """
     letters_2d: list[list[Letter]] # 2d array of game letters - first key is the column - second key is the row
     letters_1d: list[Letter] # 1d array of game letters
     length: int # length/width of grid

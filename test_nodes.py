@@ -15,7 +15,14 @@ def test_recursive_solver_2():
 
 def test_recursive_solver_3():
     new_game = nodes.Game()
-    grid = []
+    grid = [['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']]
+    new_game.find_words(grid)
+    ... # checked with integrated debugger
+
+def test_recursive_solver_3_again():
+    new_game = nodes.Game()
+    grid = [['b', 'e', 'f'], ['d', 'e', 'f'], ['g', 'i', 'j']]
+    new_game.find_words(grid)
     ... # checked with integrated debugger
 
 def test_recursive_solver_4():
@@ -26,7 +33,8 @@ def test_recursive_solver_4():
 
 def test_recursive_solver_5():
     new_game = nodes.Game()
-    grid = []
+    grid = [['a', 'b', 'c', 'd', 'e'], ['b', 'c', 'd', 'e', 'f'], ['c', 'd', 'e', 'f', 'g'], ['d', 'e', 'f', 'g', 'h'], ['e', 'f', 'g', 'h', 'i']]
+    new_game.find_words(grid)
     ... # checked with integrated debugger
 
 if __name__ == '__main__':
