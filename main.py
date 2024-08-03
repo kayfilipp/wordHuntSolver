@@ -59,8 +59,17 @@ def main():
 
     grid.render_colored_table(st)
     st.button("Reset", on_click=reset)
-    st.write("Words:")
-    st.text(st.session_state['results'])
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.write("Words:")
+        for word in st.session_state['results']:
+            st.caption(word)
+    with c2:
+        st.write("Longest Word")
+        lw = [letter.character for letter in st.session_state['longest_word']]
+        lw = "".join(lw)
+        st.caption(lw)
 
 
 main()
