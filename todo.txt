@@ -1,2 +1,3 @@
-1. SQLite for the word bank -> read into game class
-2. change data structure
+3. grid customizable dimensions
+4. highlight grid for longest word
+5. randomize button

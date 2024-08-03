@@ -4,3 +4,4 @@ venv
 *.xml
 .vscode
 .idea
+.idea/workspace.xml
