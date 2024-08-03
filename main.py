@@ -32,20 +32,16 @@ def main():
     if not st.session_state.get('grid'):
         st.subheader("Please edit the word grid and press continue.", divider='rainbow')
         st.data_editor(grid.create_grid(st.session_state['grid_dim']), key="temp_grid")
-        st.button("Continue", on_click=grid.submit_word_grid, args=[st])
+        c1, c2 = st.columns(2)
+        with c1:
+            st.button("Continue", on_click=grid.submit_word_grid, args=[st])
+        with c2:
+            st.button("Randomize", on_click=grid.randomize_grid, args=[st])
         return
 
     if not st.session_state.get('grid_final', None):
         print("transforming grid...")
         grid.transform_grid(st)
-
-    # if not st.session_state.get('colored_grid', None):
-    #     grid.render_table(st)
-    # else:
-    #     grid.render_colored_table(st)
-
-    # st.button("Reset", on_click=reset)
-    # st.write("Words:")
 
     if not st.session_state.get('results', None):
         game = Nodes.Game()

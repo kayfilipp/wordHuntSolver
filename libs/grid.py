@@ -1,3 +1,7 @@
+import random
+import string
+
+
 def create_grid(n: int = 3):
     return [[None]*n]*n
 
@@ -93,12 +97,13 @@ def render_colored_table(st):
     st.html(html)
 
 
-
 def transform_grid(st):
     """Transforms grid from a row * column to a column * row struc"""
     grid = st.session_state['grid']
     dim = st.session_state['grid_dim']
     rows = []
+
+    print(grid)
 
     for i in range(0,dim):
         columns = []
@@ -107,3 +112,20 @@ def transform_grid(st):
         rows.append(columns)
 
     st.session_state['grid_final'] = rows
+
+
+def random_letter():
+    return random.choice(string.ascii_lowercase)
+
+
+def randomize_grid(st):
+    dim = st.session_state['grid_dim']
+    print(st.session_state['temp_grid'])
+    grid = {}
+
+    for row in range(0,dim):
+        grid[row] = {}
+        for col in range(0, dim):
+            grid[row][str(col)] = random_letter()
+
+    st.session_state['grid'] = grid
