@@ -2,7 +2,11 @@ import streamlit as st
 from libs import grid
 from classes import Nodes
 
+st.set_page_config(
+    page_title="WordHunt Solver App"
+)
 st.header("WordHunt Solver")
+st.caption("A Project by Luke Mileski & Filipp Kay")
 st.session_state['grid_dim'] = 3
 
 
