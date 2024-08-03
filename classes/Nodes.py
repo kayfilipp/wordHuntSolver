@@ -44,7 +44,26 @@ class SearchResults():
         self.words_by_character = set()
         self.words_by_coordinates = []
     
-    def find_data(self):
+    def eliminate_duplicates(self) -> None:
+        """
+        Removes any deepcopied duplicates from inner Letter lists in words_found
+        Much easier to do this than tinker with the recursive function - a little less efficient,
+        but not by much.
+        Redefines the words_found attribute.
+        """
+        words_without_duplicates = []
+        coordinate_traverals = []
+
+        for word in self.words_found:
+            coordinate_traveral = [letter.coordinates for letter in word]
+            # only adding word if current path hasn't been used - based off coordinates
+            if coordinate_traveral not in coordinate_traverals:
+                coordinate_traverals.append(coordinate_traveral)
+                words_without_duplicates.append(word)
+        
+        self.words_found = words_without_duplicates
+    
+    def find_data(self) -> None:
         """
         Uses the words_found attribute to find data for characters/coordinates
         """
@@ -81,6 +100,7 @@ class Game():
         for letter in new_search.letters_1d:
             new_search.recursive_solver(letter, results, first_call=True)
 
+        results.eliminate_duplicates()
         results.find_data()
         self.all_search_results.append(results)
     
@@ -180,6 +200,19 @@ class Search(Game):
                             else:
                                 neighbor = self.letters_2d[neighbor_coordinates[0]][neighbor_coordinates[1]]
                                 letter.neighbors.append(neighbor)
+            
+    def check_dictionary(self, search_results: SearchResults):
+        """
+        Checks if the current word is an actual word and not already in the dictionary
+        If it is, it's added to the words found then checked if it's the longest word found
+        """
+        prefix = self.current_word[:3]
+
+        if self.current_word in self.prefixes_to_words[prefix]:
+            search_results.words_found.append(deepcopy(self.letters_traversed))
+            # checking if its the longest word added
+            if len(self.letters_traversed) > len(search_results.longest_word):
+                search_results.longest_word = deepcopy(self.letters_traversed)
 
     def recursive_solver(self, current_letter: Letter, search_results: SearchResults, first_call=False):
         """
@@ -193,18 +226,14 @@ class Search(Game):
             for letter in self.letters_1d:
                 letter.currently_found = False
             current_letter.currently_found = True
+
         # word can't exceed the number of characters on the grid
         if len(self.current_word) == self.length ** 2:
             # could still be a valid word, though
-            prefix = self.current_word[:3]
-            if self.current_word in self.prefixes_to_words[prefix]:
-                    search_results.words_found.append(deepcopy(self.letters_traversed))
-                    # checking if its the longest word added
-                    if len(self.letters_traversed) > len(search_results.longest_word):
-                        search_results.longest_word = deepcopy(self.letters_traversed)
+            self.check_dictionary(search_results)
             return
         
-        
+        # all adjacent letters that haven't been found yet
         possible_next_letters = [letter for letter in current_letter.neighbors if not letter.currently_found]
 
         for neighbor in possible_next_letters:
@@ -223,19 +252,16 @@ class Search(Game):
             # current word has 3+ letters and has a valid prefix
             if prefix_length >= 3:
                 # checking if the current word is an actual word
-                prefix = self.current_word[:3]
-                if self.current_word in self.prefixes_to_words[prefix]:
-                    search_results.words_found.append(deepcopy(self.letters_traversed))
-                    # checking if its the longest word added
-                    if len(self.letters_traversed) > len(search_results.longest_word):
-                        search_results.longest_word = deepcopy(self.letters_traversed)
+                self.check_dictionary(search_results)
+
                 # checking if the current word + neighbor's character is a possible word
+                prefix = self.current_word[:3]
                 possible_big_prefix = self.current_word + neighbor.character # prefix containing 4+ characters
                 # possible words must start with the current prefix
                 possible_words = [word for word in self.prefixes_to_words[prefix] \
                                   if len(word) >= len(possible_big_prefix) and word[:len(possible_big_prefix)] == possible_big_prefix]
                 if len(possible_words) == 0: # base case - branch is done
-                    return
+                    continue
                 # more possible words to go
                 else:
                     # updating tracker variables
@@ -249,3 +275,7 @@ class Search(Game):
             self.current_word = self.current_word[:-1]
             prev_letter = self.letters_traversed.pop()
             prev_letter.currently_found = False
+        
+        # edge case where there's no possible next letters but is still a word
+        if len(possible_next_letters) == 0:
+            self.check_dictionary(search_results)

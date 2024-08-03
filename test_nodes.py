@@ -22,7 +22,7 @@ def test_recursive_solver_3():
 
 def test_recursive_solver_3_again():
     new_game = nodes.Game()
-    grid = [['b', 'e', 'f'], ['d', 'e', 'f'], ['g', 'i', 'j']]
+    grid = [['a', 'c', 'c'], ['p', 'r', 'e'], ['d', 'e', 'd']]
     new_game.find_words(grid)
     ... # checked with integrated debugger
 
