@@ -27,10 +27,12 @@ def submit_word_grid(st):
     # concurrently check if each row has the correct number of edited cells and load it into a new data structure
     for i in range(0, dim):
         for j in range(0, dim):
-            cell = edited_rows[i].get(f'{j}', '')
+            cell = edited_rows[i].get(str(j), '')
             if len(cell) != 1 or not cell.isalpha():
                 st.error("Please insert one letter into each cell.")
                 return
+
+            edited_rows[i][str(j)] = str(cell).lower()
 
     st.session_state['grid'] = edited_rows
 
@@ -57,5 +59,19 @@ def render_table(st):
         html += f"<tr>{td}</tr>"
 
     html+="</table>"
-    print(html)
     st.html(html)
+
+
+def transform_grid(st):
+    """Transforms grid from a row * column to a column * row struc"""
+    grid = st.session_state['grid']
+    dim = st.session_state['grid_dim']
+    rows = []
+
+    for i in range(0,dim):
+        columns = []
+        for j in range(0,dim):
+            columns.append(grid[j][str(i)])
+        rows.append(columns)
+
+    st.session_state['grid_final'] = rows

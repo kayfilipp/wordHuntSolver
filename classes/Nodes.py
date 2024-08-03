@@ -1,9 +1,15 @@
 from typing import Optional
 from collections import defaultdict
 from copy import deepcopy
+import os
 """
 Contains classes related to the word search
 """
+
+
+dir_path = os.getcwd()
+print(dir_path)
+
 
 class Letter():
     """
@@ -66,7 +72,7 @@ class Game():
         # connect ui commands to find_words() method
         # connect ui to find 2d_grid of characters for each search
     
-    def find_words(self, character_2d_array: list[list[str]]):
+    def find_words(self, character_2d_array: list[list[str]]) -> None:
         """
         Finds all possible words within the grid - using Search object's recursive_solver() method
         """
@@ -91,8 +97,8 @@ class Game():
         """
         prefixes = set()
         prefixes_to_words = defaultdict(set)
-        
-        with open('long_wordlist.txt') as f:
+
+        with open('./classes/long_wordlist.txt') as f:
             for line in f:
                 word = line.strip()
                 # game only accepts 3 letter words

@@ -1,11 +1,15 @@
 import streamlit as st
 from libs import grid
+from classes import Nodes
+
 st.header("WordHunt Solver")
 st.session_state['grid_dim'] = 3
 
 
 def reset():
     del st.session_state['grid']
+    del st.session_state['results']
+    del st.session_state['grid_final']
 
 
 def main():
@@ -15,10 +19,28 @@ def main():
         st.button("Continue", on_click=grid.submit_word_grid, args=[st])
         return
 
+    if not st.session_state.get('grid_final', None):
+        print("transforming grid...")
+        grid.transform_grid(st)
+
     grid.render_table(st)
     st.button("Reset", on_click=reset)
+    st.write("Words:")
 
-    st.write("Solution:")
+    if not st.session_state.get('results', None):
+        game = Nodes.Game()
+        game.find_words(st.session_state['grid_final'])
+
+        st.session_state['results'] = set([])
+        for results in game.all_search_results:
+            print(results.words_by_character)
+            st.session_state['results'] = st.session_state['results'] | results.words_by_character
+
+    st.text(st.session_state['results'])
+
+
+
+
 
 
 main()

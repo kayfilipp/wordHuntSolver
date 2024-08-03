@@ -1,5 +1,6 @@
 import pytest
-import nodes
+from classes import Nodes as nodes
+
 
 def test_Search_constructor():
     new_search = nodes.Search([['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']])
