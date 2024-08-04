@@ -1,14 +1,23 @@
+"""
+Contains classes related to the word search such as:
+
+- Letter: nodes for each cell in the game grid
+- SearchResults: resultant data from a search in the game like words found
+- Game: holds a list of SearchResult objects for each search and dictionary/prefix data
+- Search(Game): conducts a search and finds all words in the grid by off word hunt's rules
+
+Notes:
+The Game class holds a find_words() method to be called with a 2d array of characters
+(inner lists are columns - x coordinate is the first index / y coordinate is the second index).
+
+Method is to be called whenever the user begins a search - resulting SearchResults 
+is appended to the Game object's all_search_results attribute (list[SearchResults])
+"""
+
 from typing import Optional
 from collections import defaultdict
 from copy import deepcopy
 import os
-"""
-Contains classes related to the word search
-"""
-
-
-dir_path = os.getcwd()
-print(dir_path)
 
 
 class Letter():
@@ -17,19 +26,20 @@ class Letter():
     """
     character: str # a-z
     neighbors: list['Letter'] # all touching Letter objects
-    coordinates: tuple[int, int] # (x, y)
-    origin: Optional['Letter'] # the letter branched off of
+    coordinates: tuple[int, int] # (x, y) - (0, 0) at top left, all coordinates are positive
+    currently_found: bool # for recursion branches - can't make a word using same character twice
 
     def __init__(self, character: str, coordinates: tuple[int, int]):
         self.character = character
         self.coordinates = coordinates
         self.neighbors = []
-        self.currently_found = False # for recursion - can't make a word using same character twice
+        self.currently_found = False
 
 
 class SearchResults():
     """
     Holds all relevant data related to a game search
+
     NOTE: words_by_character likely includes less items than words_by_coordinates and words_found -
     can be multiple branches for spelling the same word
     """
@@ -48,7 +58,8 @@ class SearchResults():
         """
         Removes any deepcopied duplicates from inner Letter lists in words_found
         Much easier to do this than tinker with the recursive function - a little less efficient,
-        but not by much.
+        but not by much
+
         Redefines the words_found attribute.
         """
         words_without_duplicates = []
@@ -66,6 +77,9 @@ class SearchResults():
     def find_data(self) -> None:
         """
         Uses the words_found attribute to find data for characters/coordinates
+
+        Fills in the words_by_character and words_by_coordinates attributes, initially
+        set as empty sets in constructor
         """
         for word in self.words_found:
             self.words_by_coordinates.append([])
@@ -78,7 +92,8 @@ class SearchResults():
 
 class Game():
     """
-    Holds all relevant game info
+    Holds dictionary/prefix data and resultant data from all searches
+    conducting in a game
     """
 
     prefixes: set # all possible prefixes 1-3 letters in english dictionary
@@ -88,23 +103,25 @@ class Game():
     def __init__(self):
         self.create_hashes()
         self.all_search_results = []
-        # connect ui commands to find_words() method
-        # connect ui to find 2d_grid of characters for each search
     
     def find_words(self, character_2d_array: list[list[str]]) -> None:
         """
         Finds all possible words within the grid - using Search object's recursive_solver() method
+
+        Resultant data (SearchResults object) is appended to the all_search_results attribute
         """
         results = SearchResults()
         new_search = Search(character_2d_array)
         for letter in new_search.letters_1d:
             new_search.recursive_solver(letter, results, first_call=True)
 
+        # modifies/finds results
         results.eliminate_duplicates()
         results.find_data()
+        # adds results to list of searches
         self.all_search_results.append(results)
     
-    def create_hashes(self):
+    def create_hashes(self) -> None:
         """
         Creates a hashset and a hashmap:
             - hashset contains all possible 1, 2, and 3 letter prefixes.
@@ -114,7 +131,10 @@ class Game():
 
         hashset: {'a', 'ba', 'tor', ...}
         hashmap: {'tor': {'torn', 'torch', ...}, 'tra': {'train', 'trade', ...} ...}
+
+        Assigns these hash structures to prefixes (set) and prefixes_to_words (dict) attributes
         """
+
         prefixes = set()
         prefixes_to_words = defaultdict(set)
 
@@ -146,7 +166,7 @@ class Search(Game):
     letters_1d: list[Letter] # 1d array of game letters
     length: int # length/width of grid
     current_word: str # the search branch's current word
-    letters_traversed: list[Letter]
+    letters_traversed: list[Letter] # subsequent Letter objects in current traversal
     
     def __init__(self, characters_2d: list[list[str]]):
         super().__init__()
@@ -158,7 +178,12 @@ class Search(Game):
         self.current_word = ""
         self.letters_traversed = []
 
-    def flatten_letters_2d(self):
+    def flatten_letters_2d(self) -> None:
+        """
+        Converts the 2d array of Letter objects into a 1d array for ease of use
+
+        1d list of Letter objects is assigned to letters_1d attribute
+        """
         # looping through grid
         letters_1d = []
         for col in self.letters_2d:
@@ -167,7 +192,7 @@ class Search(Game):
 
         self.letters_1d = letters_1d
 
-    def set_letter_coordinates_and_characters(self, characters_2d):
+    def set_letter_coordinates_and_characters(self, characters_2d) -> None:
         """
         Populates the letters_2d attribute with appropriate letter objects
         """
@@ -176,9 +201,12 @@ class Search(Game):
                 character = characters_2d[x][y]
                 self.letters_2d[x].append(Letter(character, (x, y)))
 
-    def set_neighbors(self):
+    def set_neighbors(self) -> None:
         """
         Attributes neighbors to every Letter object
+
+        A neighbor of Letter1 is another Letter object adjacent to Letter1,
+        meaning touching sides or corners
         """
         # looping over columns
         for x, col in enumerate(self.letters_2d):
@@ -201,23 +229,26 @@ class Search(Game):
                                 neighbor = self.letters_2d[neighbor_coordinates[0]][neighbor_coordinates[1]]
                                 letter.neighbors.append(neighbor)
             
-    def check_dictionary(self, search_results: SearchResults):
+    def check_dictionary(self, search_results: SearchResults) -> None:
         """
         Checks if the current word is an actual word and not already in the dictionary
         If it is, it's added to the words found then checked if it's the longest word found
         """
         prefix = self.current_word[:3]
-
+        # seeing if it is an actual word
         if self.current_word in self.prefixes_to_words[prefix]:
             search_results.words_found.append(deepcopy(self.letters_traversed))
             # checking if its the longest word added
             if len(self.letters_traversed) > len(search_results.longest_word):
                 search_results.longest_word = deepcopy(self.letters_traversed)
 
-    def recursive_solver(self, current_letter: Letter, search_results: SearchResults, first_call=False):
+    def recursive_solver(self, current_letter: Letter, search_results: SearchResults, first_call=False) -> None:
         """
         Finds all possible words in the grid
         Possible words must be <= grid_length ** 2
+
+        Results stored through subsequent calls to check_dictionary() method,
+        which modifies its search_results argument
         """
         # must reset tracking variables on initial call
         if first_call:
