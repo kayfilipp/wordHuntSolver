@@ -14,10 +14,9 @@ Method is to be called whenever the user begins a search - resulting SearchResul
 is appended to the Game object's all_search_results attribute (list[SearchResults])
 """
 
-from typing import Optional
 from collections import defaultdict
 from copy import deepcopy
-import os
+from time import time
 
 
 class Letter():
@@ -45,14 +44,16 @@ class SearchResults():
     """
     words_found: list[list[Letter]] # each inner list holds the subsequent Letter objects traversed needed to make a word
     longest_word: list[Letter] # the longest word that's been found
-    words_by_character: set[str] # all words found in a search
+    words_by_character: set[str] | list[str] # all words found in a search
     words_by_coordinates: list[list[tuple[int, int]]] # each inner list holds subsequent coordinates of letters that make up a word
+    search_time: float # runtime for finding words
 
     def __init__(self):
         self.words_found = []
         self.longest_word = []
         self.words_by_character = set()
         self.words_by_coordinates = []
+        self.search_time = time()
     
     def eliminate_duplicates(self) -> None:
         """
@@ -87,8 +88,8 @@ class SearchResults():
             for letter in word:
                 self.words_by_coordinates[-1].append(letter.coordinates)
                 new_word.append(letter.character)
-            self.words_by_character.add(''.join(new_word))
-
+            self.words_by_character.add(''.join(new_word)) # type: ignore
+    
 
 class Game():
     """
@@ -118,6 +119,10 @@ class Game():
         # modifies/finds results
         results.eliminate_duplicates()
         results.find_data()
+        # sorting alphabetically
+        results.words_by_character = sorted(list(results.words_by_character))
+        # finding runtime
+        results.search_time = round(time() - results.search_time, 2)
         # adds results to list of searches
         self.all_search_results.append(results)
     

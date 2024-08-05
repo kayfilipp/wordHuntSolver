@@ -2,8 +2,8 @@ import random
 import string
 
 
-def create_grid(n: int = 3):
-    return [[None]*n]*n
+def create_grid(st, n: int = 3):
+    return [['']*n]*n
 
 
 def submit_word_grid(st):
@@ -70,6 +70,11 @@ def render_colored_table(st):
     grid = st.session_state['grid']
     dim = st.session_state['grid_dim']
     longest_word = st.session_state['longest_word']
+
+    num_words_found = st.session_state['num_words_found']
+    runtime = st.session_state['runtime']
+    results_header = f"{num_words_found} word{'s' if num_words_found!=1 else ''} found in {runtime} seconds"
+
     coords = [letter.coordinates for letter in longest_word]
     html = """
         <style>
@@ -79,10 +84,18 @@ def render_colored_table(st):
             td {
                 text-align: center
             }
-        </style>
-        <table style='width:100%' table-layout:'fixed' border='2'>
-    """
-
+            .header-right {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    padding: 5px;
+                    font-size: 16px;
+                    color: #666;
+                }
+            </style>
+            <table style='width:100%' table-layout:'fixed' border='2'>
+        """
+    html += f"<div class='header-right'>{results_header}</div>"
     for i in range(0, dim):
         td = []
         for j in range(0, dim):
