@@ -1,7 +1,7 @@
 # Recursive Wordhunt Solver 🧩
 _A project by Filipp Krasovsky & Luke Mileski_
 #### Streamlit Url: 
-https://wordhuntersolver.streamlit.app/
+https://wordhuntsolver.streamlit.app/
 
 ## Overview 
 This project uses recursive logic to find possible solutions to a crossword puzzle similar to WordHunt, a game available 
