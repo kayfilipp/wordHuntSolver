@@ -8,7 +8,8 @@ done by setting breakpoints at ellipses (...)
 from time import time
 import pytest
 from classes import Nodes as nodes
-
+from random import choice
+import string
 
 def test_Search_constructor():
     new_search = nodes.Search([['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']])
@@ -76,6 +77,18 @@ def test_recursive_solver_10():
     actual_completion_time = final_time - start_time
     ... # time/accuracy checked with integrated debugger - set breakpoint
     # ~6.4 seconds - not too shabby
+
+def test_averages():
+    new_game = nodes.Game()
+    dimensions_to_avg_runtime = {}
+    for dimensions in range(1, 11):
+        for _ in range(100):
+            new_game.find_words([[choice(string.ascii_lowercase) for _ in range(dimensions)] for _ in range(dimensions)])
+
+        last_search_results = new_game.all_search_results[-100:]
+        average_search_runtime = sum([search_result.search_time for search_result in last_search_results])/100
+        dimensions_to_avg_runtime[dimensions] = round(average_search_runtime, 2)
+    ... # runtime check
 
 if __name__ == '__main__':
     pytest.main(['test_nodes.py'])
